@@ -22,14 +22,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-import sys
-from PySide import QtGui
 
-
-from data.apps.main.main import BBApp
-
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    my_app = BBApp()
-    my_app.showMaximized()
-    sys.exit(app.exec_())

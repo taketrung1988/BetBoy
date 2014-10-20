@@ -22,14 +22,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-import sys
-from PySide import QtGui
+
+from data.sql_core import queries as s
+from data.sql_core.csv_loader import load_csv
 
 
-from data.apps.main.main import BBApp
+class Database(object):
+    def __init__(self, path):
+        s.create_tables()
+        self.csv_db = load_csv('test.csv')
 
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    my_app = BBApp()
-    my_app.showMaximized()
-    sys.exit(app.exec_())
+    def stats_central(self):
+        s.fill_tables(self.csv_db)
+
+    def simulation(self):
+        pass
+
+    def export(self):
+        pass
+
+
+
+
+

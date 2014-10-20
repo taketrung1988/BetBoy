@@ -22,14 +22,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-import sys
-from PySide import QtGui
+
+from data.third_party.peewee.playhouse import csv_loader
+from data.third_party.peewee.peewee import (SqliteDatabase, TextField,
+                                            FloatField, IntegerField,
+                                            DateField)
+
+db = SqliteDatabase(':memory:')
 
 
-from data.apps.main.main import BBApp
+def load_csv(path):
+    fields = [DateField(), TextField(), TextField(), IntegerField(),
+              IntegerField(), FloatField(), FloatField(), FloatField()]
+    field_names = ['date', 'team_home', 'team_away', 'g_home', 'g_away',
+                   'odds_home', 'odds_draw', 'odds_away']
+    csv_db = csv_loader.load_csv(db, path, db_table='CSV', fields=fields,
+                                 field_names=field_names)
+    return csv_db
 
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    my_app = BBApp()
-    my_app.showMaximized()
-    sys.exit(app.exec_())
+
+
+
+
+

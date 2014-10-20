@@ -22,14 +22,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-import sys
-from PySide import QtGui
+
+from data.sql_core.csv_loader import load_csv
+import unittest
 
 
-from data.apps.main.main import BBApp
+class Testing(unittest.TestCase):
 
-if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    my_app = BBApp()
-    my_app.showMaximized()
-    sys.exit(app.exec_())
+    def setUp(self):
+        self.csv_db = load_csv('test.csv')
+
+    def test_csv_table(self):
+        db = self.csv_db
+        rows = db.select(
+            db.date,
+            db.team_home,
+            db.team_away,
+            db.g_home,
+            db.g_away,
+            db.odds_home,
+            db.odds_draw,
+            db.odds_away).distinct().order_by(db.date.asc()).dicts()
+        # remove duplicated rows
+        self.assertEqual(len(tuple(rows)), 35)
+

@@ -9,6 +9,7 @@
 
 from PySide import QtCore, QtGui
 
+
 class Ui_BetTools(object):
     def setupUi(self, BetTools):
         BetTools.setObjectName("BetTools")
@@ -106,4 +107,4 @@ class Ui_BetTools(object):
         self.actionMatch_selector.setText(QtGui.QApplication.translate("BetTools", "Match selector", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSimulations_browser.setText(QtGui.QApplication.translate("BetTools", "Simulations browser", None, QtGui.QApplication.UnicodeUTF8))
 
-from data.apps.icons import icons_rc
+from data.static.icons import icons_rc

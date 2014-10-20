@@ -40,7 +40,7 @@ class BBApp(QtGui.QMainWindow):
         self.ui = Ui_BetTools()
         self.ui.setupUi(self)
         ### Set style
-        with open(os.path.join('data', 'apps', 'styles', 'dark.css'), 'r') \
+        with open(os.path.join('data', 'static', 'styles', 'dark.css'), 'r') \
             as style:
             self.setStyleSheet(style.read())
         self.win_about()
