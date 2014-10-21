@@ -24,7 +24,7 @@ THE SOFTWARE.
 """
 from data.third_party.peewee.peewee import (Model, SqliteDatabase, TextField,
                                             FloatField, IntegerField,
-                                            ForeignKeyField, DateField)
+                                            ForeignKeyField)
 
 db = SqliteDatabase(':memory:')
 
@@ -50,8 +50,8 @@ class TeamStats(BaseModel):
     points_bb = FloatField(default=0)
     margin_of_wins = FloatField(default=0)
     margin_of_loses = FloatField(default=0)
-    goal_difference_wins = IntegerField(default=0)
-    goal_difference_loses = IntegerField(default=0)
+    goal_diff_wins = IntegerField(default=0)
+    goal_diff_loses = IntegerField(default=0)
     bts = IntegerField(default=0)
     over25 = IntegerField(default=0)
     under25 = IntegerField(default=0)

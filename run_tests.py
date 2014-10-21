@@ -2,7 +2,7 @@
 """
  The MIT License (MIT)
 
-Copyright (c) 2014 Jacek Markowski
+Copyright (c) 2014, Jacek Markowski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,27 +22,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
-
-from data.sql_core.csv_loader import load_csv
 import unittest
-
-
-class Testing(unittest.TestCase):
-
-    def setUp(self):
-        self.csv_db = load_csv('test.csv')
-
-    def test_csv_table(self):
-        db = self.csv_db
-        rows = db.select(
-            db.date,
-            db.team_home,
-            db.team_away,
-            db.g_home,
-            db.g_away,
-            db.odds_home,
-            db.odds_draw,
-            db.odds_away).distinct().order_by(db.date.asc()).dicts()
-        # remove duplicated rows
-        self.assertEqual(len(tuple(rows)), 35)
-
+import os
+path = os.path.join('unittests', '')
+suite = unittest.TestLoader().discover(start_dir=path)
+os.chdir(os.path.join('unittests'))
+unittest.TextTestRunner(verbosity=2).run(suite)

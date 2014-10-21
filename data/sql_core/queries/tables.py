@@ -24,13 +24,24 @@ THE SOFTWARE.
 """
 
 from data.sql_core import models
-from data.sql_core.models import Team, TeamStats, LastMatches, Series
+from data.sql_core.models import (Team, TeamStats, TeamStatsHome, TeamStatsAway,
+                                  LastMatches, LastMatchesHome, LastMatchesAway,
+                                  Series, SeriesHome, SeriesAway)
+from data.sql_core.queries.stats import (update_team_stats_draw,
+                                         update_team_stats_win_home,
+                                         update_team_stats_win_away,
+                                         check_result, bts_stats,
+                                         over_under_stats)
+from data.sql_core.queries.series import (update_team_series_draw,
+                                          update_team_series_win_home,
+                                          update_team_series_win_away)
 
 
 def create_tables():
     models.db.connect()
-    models.db.create_tables([Team, TeamStats,
-                             LastMatches, Series], safe=True)
+    tables = [Team, TeamStats, TeamStatsHome, TeamStatsAway, LastMatches,
+              LastMatchesHome, LastMatchesAway, Series, SeriesHome, SeriesAway]
+    models.db.create_tables(tables, safe=True)
 
 
 def fill_tables(csv_db):
@@ -51,67 +62,52 @@ def put_teams_into_table(csv_db):
     for team in teams:
         t = Team.create(name=team)
         TeamStats.create(team=t)
+        TeamStatsHome.create(team=t)
+        TeamStatsAway.create(team=t)
 
 
 def update_team_stats(csv_db):
     q = csv_db.select(csv_db.date, csv_db.team_home, csv_db.team_away,
                       csv_db.g_home, csv_db.g_away,
                       csv_db.odds_home, csv_db.odds_draw,
-                      csv_db.odds_away).distinct().order_by(csv_db.date.asc())
+                      csv_db.odds_away).\
+        distinct().\
+        where(csv_db.g_home > -1 and csv_db.g_away > -1).\
+        order_by(csv_db.date.asc())
     for i in q:
         home = Team.get(name=i.team_home)
         away = Team.get(name=i.team_away)
-        update_basic_stats(home, away, i.g_home, i.g_away)
+        update_tables(home, away, i.g_home, i.g_away)
 
 
-def check_result(g_home, g_away):
-    if g_home == -1 or g_away == -1:
-        result = -1
-    elif g_home == g_away:
-        result = 0
-    elif g_home > g_away:
-        result = 1
-    elif g_home < g_away:
-        result = 2
-
-    return result
-
-
-def update_basic_stats(home, away, g_home, g_away):
+def update_tables(home, away, g_home, g_away):
     result = check_result(g_home, g_away)
+    home_stats = {'team': home, 'g_scored': g_home, 'g_lost': g_away,
+                  'result': result}
+    away_stats = {'team': away, 'g_scored': g_away, 'g_lost': g_home,
+                  'result': result}
+    home_series = {'team': home}
+    away_series = {'team': away}
+    bts_stats(home_stats)
+    bts_stats(away_stats)
+    over_under_stats(home_stats)
+    over_under_stats(away_stats)
     if result == 0:
-        update_draw(home, g_home, g_away)
-        update_draw(away, g_away, g_home)
+        update_team_stats_draw(home_stats, away_stats)
+        update_team_series_draw(home_series, away_series)
     if result == 1:
-        update_winner(home, g_home, g_away)
-        update_loser(away, g_away, g_home)
+        update_team_stats_win_home(home_stats, away_stats)
+        update_team_series_win_home(home_series, away_series)
     if result == 2:
-        update_loser(home, g_home, g_away)
-        update_winner(away, g_away, g_home)
+        update_team_stats_win_away(home_stats, away_stats)
+        update_team_series_win_away(home_series, away_series)
 
 
-def update_winner(team, g_scored, g_lost):
-    TeamStats.\
-        update(wins=TeamStats.wins + 1,
-               goals_scored=TeamStats.goals_scored + g_scored,
-               goals_lost=TeamStats.goals_lost + g_lost).\
-        where(TeamStats.team == team).execute()
 
 
-def update_draw(team, g_scored, g_lost):
-    TeamStats.\
-        update(draws=TeamStats.draws + 1,
-               goals_scored=TeamStats.goals_scored + g_scored,
-               goals_lost=TeamStats.goals_lost + g_lost).\
-        where(TeamStats.team == team).execute()
 
 
-def update_loser(team, g_scored, g_lost):
-    TeamStats.\
-        update(loses=TeamStats.loses + 1,
-               goals_scored=TeamStats.goals_scored + g_scored,
-               goals_lost=TeamStats.goals_lost + g_lost).\
-        where(TeamStats.team == team).execute()
+
 
 
 
