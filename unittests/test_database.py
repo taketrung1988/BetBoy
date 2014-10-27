@@ -23,13 +23,63 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from __future__ import print_function
 import unittest
 from data.sql_core import (models as m,
                            csv_loader as csv)
 from data.sql_core.queries import tables as s
 
-TABLE = [
+
+class Testing(unittest.TestCase):
+    def setUp(self):
+        s.create_tables()
+        self.csv_db = csv.load_csv('test.csv')
+        s.fill_tables(self.csv_db)
+
+    def assert_team_stats(self, team, wins, draws, loses, **kwargs):
+        #  TODO TeamStatsHome, TeamStatsAway
+        team = m.TeamStats.\
+            get(m.TeamStats.team == m.Team.get(m.Team.name == team))
+
+        self.assertEqual(team.win, wins)
+        self.assertEqual(team.draw, draws)
+        self.assertEqual(team.lose, loses)
+        self.assertAlmostEqual(team.margin_of_win, kwargs['mov'], delta=0.01)
+        self.assertAlmostEqual(team.margin_of_lose, kwargs['mol'], delta=0.01)
+        self.assertAlmostEqual(team.point, kwargs['points'], delta=0.01)
+        self.assertAlmostEqual(team.point_bb, kwargs['points_bb'], delta=0.01)
+
+    def assert_team_series(self, team=None, **kw):
+        #  TODO TeamSeriesHome, TeamSeriesAway
+        team = m.Series.\
+            get(m.Series.team == m.Team.get(m.Team.name == team))
+        self.assertEqual(team.win, kw.get('win', 0))
+        self.assertEqual(team.draw, kw.get('draw', 0))
+        self.assertEqual(team.lose, kw.get('lose', 0))
+        self.assertEqual(team.no_lose, kw.get('no_lose', 0))
+        self.assertEqual(team.no_win, kw.get('no_win', 0))
+        self.assertEqual(team.no_draw, kw.get('no_draw', 0))
+        self.assertEqual(team.bts, kw.get('bts', 0))
+        self.assertEqual(team.no_bts, kw.get('no_bts', 0))
+        self.assertEqual(team.over25, kw.get('over25', 0))
+        self.assertEqual(team.no_over25, kw.get('no_over25', 0))
+        self.assertEqual(team.under25, kw.get('under25', 0))
+        self.assertEqual(team.no_under25, kw.get('no_under25', 0))
+        self.assertEqual(team.scored_goal, kw.get('scored_goal', 0))
+        self.assertEqual(team.no_scored_goal, kw.get('no_scored_goal', 0))
+        self.assertEqual(team.lost_goal, kw.get('lost_goal', 0))
+        self.assertEqual(team.no_lost_goal, kw.get('no_lost_goal', 0))
+
+    def test_stats(self):
+        for t in STATS:
+            self.assert_team_stats(**t)
+        #for i in m.TeamStats.select().order_by(m.TeamStats.points.desc()):
+        #    print(i.matches, i.team.name, i.points, i.points_bb)
+
+    def test_series(self):
+        for t in SERIES:
+            self.assert_team_series(**t)
+
+STATS = [
     {'team': 'E.Frankfurt', 'wins': 3, 'draws': 0, 'loses': 0,
      'mov': 2.0, 'mol': 0, 'points': 9, 'points_bb': 8.3},
     {'team': 'B.Munich', 'wins': 3, 'draws': 0, 'loses': 0,
@@ -63,32 +113,77 @@ TABLE = [
     {'team': 'Hamburg', 'wins': 0, 'draws': 0, 'loses': 3,
      'mov': 0, 'mol': 1.33, 'points': 0, 'points_bb': 0.4},
     {'team': 'Mainz05', 'wins': 0, 'draws': 1, 'loses': 2,
-     'mov': 0, 'mol': 1, 'points': 1, 'points_bb': 1.2}]
+     'mov': 0, 'mol': 1, 'points': 1, 'points_bb': 1.2}
+]
 
+SERIES = [
+    {'team': 'E.Frankfurt', 'win': 3, 'draw': 0, 'lose': 0,
+     'no_lose': 3, 'no_win': 0, 'no_draw': 3, 'bts': 1,
+     'no_bts': 0, 'over25': 3, 'no_over25': 0, 'under25': 0, 'no_under25': 3,
+     'scored_goal': 0, 'no_scored_goal':0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'B.Munich', 'win': 3, 'draw': 0, 'lose': 0,
+     'no_lose': 3, 'no_win': 0, 'no_draw': 3, 'bts': 2,
+     'no_bts': 0, 'over25': 3, 'no_over25': 0, 'under25': 0, 'no_under25': 3,
+     'scored_goal': 0, 'no_scored_goal':0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Nuremberg', 'win': 1, 'draw': 0, 'lose': 0,
+     'no_lose': 3, 'no_win': 0, 'no_draw': 1, 'bts': 2,
+     'no_bts': 0, 'over25': 1, 'no_over25': 0, 'under25': 0, 'no_under25': 1,
+     'scored_goal': 0, 'no_scored_goal':0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Hannover', 'win': 2, 'draw': 0, 'lose': 0,
+     'no_lose': 3, 'no_win': 0, 'no_draw': 2, 'bts': 1,
+     'no_bts': 0, 'over25': 3, 'no_over25': 0, 'under25': 0, 'no_under25': 3,
+     'scored_goal': 0, 'no_scored_goal':0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Dortmund', 'win': 1, 'draw': 0, 'lose': 0,
+     'no_lose': 3, 'no_win': 0, 'no_draw': 1, 'bts': 0,
+     'no_bts': 1, 'over25': 1, 'no_over25': 0, 'under25': 0, 'no_under25': 1,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Schalke04', 'win': 2, 'draw': 0, 'lose': 0,
+     'no_lose': 3, 'no_win': 0, 'no_draw': 2, 'bts': 0,
+     'no_bts': 1, 'over25': 0, 'no_over25': 1, 'under25': 1, 'no_under25': 0,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Freiburg', 'win': 1, 'draw': 0, 'lose': 0,
+     'no_lose': 1, 'no_win': 0, 'no_draw': 2, 'bts': 1,
+     'no_bts': 0, 'over25': 1, 'no_over25': 0, 'under25': 0, 'no_under25': 1,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Furth', 'win': 0, 'draw': 0, 'lose': 1,
+     'no_lose': 0, 'no_win': 1, 'no_draw': 3, 'bts': 0,
+     'no_bts': 3, 'over25': 0, 'no_over25': 2, 'under25': 2, 'no_under25': 0,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Wolfsburg', 'win': 0, 'draw': 1, 'lose': 0,
+     'no_lose': 1, 'no_win': 2, 'no_draw': 0, 'bts': 0,
+     'no_bts': 3, 'over25': 0, 'no_over25': 1, 'under25': 1, 'no_under25': 0,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Mgladbach', 'win': 0, 'draw': 0, 'lose': 1,
+     'no_lose': 0, 'no_win': 2, 'no_draw': 1, 'bts': 1,
+     'no_bts': 0, 'over25': 1, 'no_over25': 0, 'under25': 0, 'no_under25': 1,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Dusseldorf', 'win': 0, 'draw': 2, 'lose': 0,
+     'no_lose': 3, 'no_win': 2, 'no_draw': 0, 'bts': 0,
+     'no_bts': 3, 'over25': 0, 'no_over25': 3, 'under25': 3, 'no_under25': 0,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Hoffenheim', 'win': 0, 'draw': 0, 'lose': 3,
+     'no_lose': 0, 'no_win': 3, 'no_draw': 3, 'bts': 1,
+     'no_bts': 0, 'over25': 3, 'no_over25': 0, 'under25': 0, 'no_under25': 3,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Stuttgart', 'win': 0, 'draw': 1, 'lose': 0,
+     'no_lose': 1, 'no_win': 3, 'no_draw': 0, 'bts': 0,
+     'no_bts': 1, 'over25': 0, 'no_over25': 1, 'under25': 1, 'no_under25': 0,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Augsburg', 'win': 0, 'draw': 1, 'lose': 0,
+     'no_lose': 1, 'no_win': 3, 'no_draw': 0, 'bts': 0,
+     'no_bts': 1, 'over25': 0, 'no_over25': 1, 'under25': 1, 'no_under25': 0,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Hamburg', 'win': 0, 'draw': 0, 'lose': 3,
+     'no_lose': 0, 'no_win': 3, 'no_draw': 3, 'bts': 1,
+     'no_bts': 0, 'over25': 1, 'no_over25': 0, 'under25': 0, 'no_under25': 1,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
+    {'team': 'Mainz05', 'win': 0, 'draw': 0, 'lose': 2,
+     'no_lose': 0, 'no_win': 3, 'no_draw': 2, 'bts': 1,
+     'no_bts': 0, 'over25': 1, 'no_over25': 0, 'under25': 0, 'no_under25': 1,
+     'scored_goal': 0, 'no_scored_goal': 0, 'lost_goal': 0, 'no_lost_goal': 0},
 
-class Testing(unittest.TestCase):
-    def setUp(self):
-        s.create_tables()
-        self.csv_db = csv.load_csv('test.csv')
+]
 
-    def assert_team_basic(self, team, wins, draws, loses, **kwargs):
-        team = m.TeamStats.\
-            get(m.TeamStats.team == m.Team.get(m.Team.name == team))
-        self.assertEqual(team.wins, wins)
-        self.assertEqual(team.draws, draws)
-        self.assertEqual(team.loses, loses)
-        self.assertAlmostEqual(team.margin_of_wins, kwargs['mov'], delta=0.01)
-        self.assertAlmostEqual(team.margin_of_loses, kwargs['mol'], delta=0.01)
-        self.assertAlmostEqual(team.points, kwargs['points'], 2)
-        self.assertAlmostEqual(team.points_bb, kwargs['points_bb'], 2)
-
-    def test_stats(self):
-        db = self.csv_db
-        s.fill_tables(db)
-        for t in TABLE:
-            self.assert_team_basic(**t)
-        #for i in m.TeamStats.select().order_by(m.TeamStats.points.desc()):
-        #    print(i.matches, i.team.name, i.points, i.points_bb)
 
 
 

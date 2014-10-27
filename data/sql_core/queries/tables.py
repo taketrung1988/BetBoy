@@ -30,11 +30,13 @@ from data.sql_core.models import (Team, TeamStats, TeamStatsHome, TeamStatsAway,
 from data.sql_core.queries.stats import (update_team_stats_draw,
                                          update_team_stats_win_home,
                                          update_team_stats_win_away,
-                                         check_result, bts_stats,
-                                         over_under_stats)
+                                         check_result)
+from data.sql_core.queries.services import (bts_stats,
+                                            over_under_stats)
 from data.sql_core.queries.series import (update_team_series_draw,
                                           update_team_series_win_home,
                                           update_team_series_win_away)
+from copy import deepcopy as copy
 
 
 def create_tables():
@@ -64,6 +66,9 @@ def put_teams_into_table(csv_db):
         TeamStats.create(team=t)
         TeamStatsHome.create(team=t)
         TeamStatsAway.create(team=t)
+        Series.create(team=t)
+        SeriesHome.create(team=t)
+        SeriesAway.create(team=t)
 
 
 def update_team_stats(csv_db):
@@ -86,12 +91,12 @@ def update_tables(home, away, g_home, g_away):
                   'result': result}
     away_stats = {'team': away, 'g_scored': g_away, 'g_lost': g_home,
                   'result': result}
-    home_series = {'team': home}
-    away_series = {'team': away}
-    bts_stats(home_stats)
-    bts_stats(away_stats)
-    over_under_stats(home_stats)
-    over_under_stats(away_stats)
+    home_series = copy(home_stats)
+    away_series = copy(away_stats)
+    for d in (home_stats, away_stats, home_series, away_series):
+        bts_stats(d)
+        over_under_stats(d)
+
     if result == 0:
         update_team_stats_draw(home_stats, away_stats)
         update_team_series_draw(home_series, away_series)

@@ -26,47 +26,20 @@ from data.sql_core.models import (Series, SeriesHome, SeriesAway)
 
 
 def update_team_series_draw(home_dict, away_dict):
-    home_dict.update(wins=0,
-                     draws=1,
-                     loses=0,
-                     points=1,
-                     points_bb=1,
-                     )
-    away_dict.update(wins=0,
-                     draws=1,
-                     loses=0,
-                     points=1,
-                     points_bb=1)
+    home_dict.update(draw=1, no_lose=1, no_win=1)
+    away_dict.update(draw=1, no_lose=1, no_win=1)
     up_team_series_all(home_dict, away_dict)
 
 
 def update_team_series_win_home(home_dict, away_dict):
-    home_dict.update(wins=1,
-                     draws=0,
-                     loses=0,
-                     points=3,
-                     points_bb=3,
-                     )
-    away_dict.update(wins=0,
-                     draws=0,
-                     loses=1,
-                     points=0,
-                     points_bb=0)
+    home_dict.update(win=1, no_lose=1, no_draw=1,)
+    away_dict.update(lose=1, no_win=1, no_draw=1)
     up_team_series_all(home_dict, away_dict)
 
 
 def update_team_series_win_away(home_dict, away_dict):
-    home_dict.update(wins=0,
-                     draws=0,
-                     loses=1,
-                     points=0,
-                     points_bb=0,
-                     )
-    away_dict.update(wins=1,
-                     draws=0,
-                     loses=0,
-                     points=3,
-                     points_bb=0)
+    home_dict.update(lose=1, no_win=1, no_draw=1)
+    away_dict.update(win=1, no_lose=1, no_draw=1)
     up_team_series_all(home_dict, away_dict)
 
 
@@ -79,17 +52,21 @@ def up_team_series_all(home_dict, away_dict):
 
 def update_series(table=None, **kw):
     table.\
-        update(wins=kw.get('wins', 0),
-               draws=kw.get('draws', 0),
-               loses=kw.get('loses', 0),
-               no_loses=kw.get('no_loses', 0),
-               no_wins=kw.get('no_wins', 0),
-               no_draws=kw.get('no_draws', 0),
-               bts=kw.get('bts', 0),
-               no_bts=kw.get('no_bts', 0),
-               over25=kw.get('over25', 0),
-               no_over25=kw.get('no_over25', 0),
-               under25=kw.get('under25', 0),
-               no_under25=kw.get('no_under25', 0),
+        update(win=new_value(table.win, kw.get('win', 0)),
+               draw=new_value(table.draw, kw.get('draw', 0)),
+               lose=new_value(table.lose, kw.get('lose', 0)),
+               no_lose=new_value(table.no_lose, kw.get('no_lose', 0)),
+               no_win=new_value(table.no_win, kw.get('no_win', 0)),
+               no_draw=new_value(table.no_draw, kw.get('no_draw', 0)),
+               bts=new_value(table.bts, kw.get('bts', 0)),
+               no_bts=new_value(table.no_bts, kw.get('no_bts', 0)),
+               over25=new_value(table.over25, kw.get('over25', 0)),
+               no_over25=new_value(table.no_over25, kw.get('no_over25', 0)),
+               under25=new_value(table.under25, kw.get('under25', 0)),
+               no_under25=new_value(table.no_under25, kw.get('no_under25', 0)),
                ).\
         where(table.team == kw['team']).execute()
+
+
+def new_value(current, new):
+    return (current+new) if new else 0

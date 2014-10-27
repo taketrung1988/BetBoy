@@ -26,28 +26,28 @@ from data.sql_core.models import (TeamStats, TeamStatsHome, TeamStatsAway)
 
 
 def update_team_stats_draw(home_dict, away_dict):
-    home_dict.update(draws=1,
-                     points=1,
-                     points_bb=1)
-    away_dict.update(draws=1,
-                     points=1,
-                     points_bb=1)
+    home_dict.update(draw=1,
+                     point=1,
+                     point_bb=1)
+    away_dict.update(draw=1,
+                     point=1,
+                     point_bb=1)
     up_team_stats_all(home_dict, away_dict)
 
 
 def update_team_stats_win_home(home_dict, away_dict):
-    home_dict.update(wins=1,
-                     points=3,
-                     points_bb=3)
-    away_dict.update(loses=1)
+    home_dict.update(win=1,
+                     point=3,
+                     point_bb=3)
+    away_dict.update(lose=1)
     up_team_stats_all(home_dict, away_dict)
 
 
 def update_team_stats_win_away(home_dict, away_dict):
-    home_dict.update(loses=1)
-    away_dict.update(wins=1,
-                     points=3,
-                     points_bb=3)
+    home_dict.update(lose=1)
+    away_dict.update(win=1,
+                     point=3,
+                     point_bb=3)
     up_team_stats_all(home_dict, away_dict)
 
 
@@ -60,16 +60,16 @@ def up_team_stats_all(home_dict, away_dict):
 
 def update_stats(table=None, **kw):
     table.\
-        update(matches=table.matches + 1,
-               wins=table.wins + kw.get('wins', 0),
-               draws=table.draws + kw.get('draws', 0),
-               loses=table.loses + kw.get('loses', 0),
-               goals_scored=table.goals_scored + kw.get('g_scored', 0),
-               goals_lost=table.goals_lost + kw.get('g_lost', 0),
-               points=table.points + kw.get('points', 0),
-               points_bb=table.points_bb + points_bb(kw),
-               goal_diff_wins=g_diff_wins(kw['team'], table, kw),
-               goal_diff_loses=g_diff_loses(kw['team'], table, kw),
+        update(match=table.match + 1,
+               win=table.win + kw.get('win', 0),
+               draw=table.draw + kw.get('draw', 0),
+               lose=table.lose + kw.get('lose', 0),
+               goal_scored=table.goal_scored + kw.get('g_scored', 0),
+               goal_lost=table.goal_lost + kw.get('g_lost', 0),
+               point=table.point + kw.get('point', 0),
+               point_bb=table.point_bb + points_bb(kw),
+               goal_diff_win=g_diff_wins(kw['team'], table, kw),
+               goal_diff_lose=g_diff_loses(kw['team'], table, kw),
                bts=table.bts + kw.get('bts', 0),
                over25=table.over25 + kw.get('over25', 0),
                under25=table.over25 + kw.get('under25', 0),
@@ -77,8 +77,8 @@ def update_stats(table=None, **kw):
         where(table.team == kw['team']).execute()
 
     table.\
-        update(margin_of_wins=mow(kw['team'], table),
-               margin_of_loses=mol(kw['team'], table),
+        update(margin_of_win=mow(kw['team'], table),
+               margin_of_lose=mol(kw['team'], table),
                ).\
         where(table.team == kw['team']).execute()
 
@@ -86,7 +86,7 @@ def update_stats(table=None, **kw):
 def mow(team_obj=None, table=None):
     query = table.get(table.team == team_obj)
     try:
-        new_mow = query.goal_diff_wins / float(query.matches)
+        new_mow = query.goal_diff_win / float(query.match)
     except ZeroDivisionError:
         new_mow = 0
     return new_mow
@@ -95,7 +95,7 @@ def mow(team_obj=None, table=None):
 def mol(team_obj=None, table=None):
     query = table.get(table.team == team_obj)
     try:
-        new_mol = query.goal_diff_loses / float(query.matches)
+        new_mol = query.goal_diff_lose / float(query.match)
     except ZeroDivisionError:
         new_mol = 0
     return new_mol
@@ -107,9 +107,9 @@ def g_diff_wins(team_obj, table, stats_dict):
     query = table.get(table.team == team_obj)
     try:
         if g_scored > g_lost:
-            new_mow = query.goal_diff_wins + abs(g_scored - g_lost)
+            new_mow = query.goal_diff_win + abs(g_scored - g_lost)
         else:
-            new_mow = query.goal_diff_wins
+            new_mow = query.goal_diff_win
     except ZeroDivisionError:
         new_mow = query.goal_diff_wins
     return new_mow
@@ -121,22 +121,12 @@ def g_diff_loses(team_obj, table, stats_dict):
     query = table.get(table.team == team_obj)
     try:
         if g_scored < g_lost:
-            new_mol = query.goal_diff_loses + abs(g_scored - g_lost)
+            new_mol = query.goal_diff_lose + abs(g_scored - g_lost)
         else:
-            new_mol = query.goal_diff_loses
+            new_mol = query.goal_diff_lose
     except ZeroDivisionError:
         new_mol = query.goal_diff_loses
     return new_mol
-
-
-def bts_stats(stats_dict):
-    bts = stats_dict['g_scored'] and stats_dict['g_lost']
-    stats_dict.update(bts=int(bts))
-
-
-def over_under_stats(stats_dict):
-    over = stats_dict['g_scored'] + stats_dict['g_lost'] > 2.5
-    stats_dict.update(over25=int(over), under25=0 if over else 1)
 
 
 def points_bb(stats_dict):
