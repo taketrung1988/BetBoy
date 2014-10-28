@@ -83,7 +83,10 @@
           </layout>
          </item>
          <item>
-          <widget class="QTreeWidget" name="treeLeagues">
+          <widget class="QComboBox" name="combo_csv_paths"/>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="tree_csv_files">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -141,7 +144,7 @@
            </property>
            <column>
             <property name="text">
-             <string notr="true">1</string>
+             <string notr="true">Csv files</string>
             </property>
            </column>
           </widget>
@@ -287,7 +290,7 @@ font: 13pt}</string>
             </size>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>5</number>
            </property>
            <widget class="QWidget" name="tab_main_standings">
             <attribute name="title">
@@ -937,9 +940,72 @@ font: 13pt}</string>
             <layout class="QVBoxLayout" name="verticalLayout_14">
              <item>
               <widget class="QTreeWidget" name="tree_picks">
+               <property name="allColumnsShowFocus">
+                <bool>false</bool>
+               </property>
+               <property name="headerHidden">
+                <bool>false</bool>
+               </property>
+               <attribute name="headerCascadingSectionResizes">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="headerDefaultSectionSize">
+                <number>50</number>
+               </attribute>
+               <attribute name="headerShowSortIndicator" stdset="0">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="headerStretchLastSection">
+                <bool>true</bool>
+               </attribute>
                <column>
                 <property name="text">
-                 <string notr="true">1</string>
+                 <string notr="true">League</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Home</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Away</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Bet</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Net</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Value</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>2</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>x2</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Comment</string>
                 </property>
                </column>
               </widget>

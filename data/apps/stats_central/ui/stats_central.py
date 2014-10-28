@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui.ui'
+# Form implementation generated from reading ui file 'stats_central.ui'
 #
-# Created: Wed Oct  1 20:55:58 2014
-#      by: pyside-uic 0.2.15 running on PySide 1.2.1
+# Created: Tue Oct 28 22:22:10 2014
+#      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -56,13 +56,16 @@ class Ui_MainWindow(object):
         self.main_combo_away.setObjectName("main_combo_away")
         self.verticalLayout.addWidget(self.main_combo_away)
         self.verticalLayout_3.addLayout(self.verticalLayout)
-        self.treeLeagues = QtGui.QTreeWidget(self.frame_2)
+        self.combo_csv_paths = QtGui.QComboBox(self.frame_2)
+        self.combo_csv_paths.setObjectName("combo_csv_paths")
+        self.verticalLayout_3.addWidget(self.combo_csv_paths)
+        self.tree_csv_files = QtGui.QTreeWidget(self.frame_2)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.treeLeagues.sizePolicy().hasHeightForWidth())
-        self.treeLeagues.setSizePolicy(sizePolicy)
-        self.treeLeagues.setMaximumSize(QtCore.QSize(300, 16777215))
+        sizePolicy.setHeightForWidth(self.tree_csv_files.sizePolicy().hasHeightForWidth())
+        self.tree_csv_files.setSizePolicy(sizePolicy)
+        self.tree_csv_files.setMaximumSize(QtCore.QSize(300, 16777215))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(243, 237, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -73,12 +76,12 @@ class Ui_MainWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(247, 247, 247))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
-        self.treeLeagues.setPalette(palette)
-        self.treeLeagues.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-        self.treeLeagues.setAlternatingRowColors(False)
-        self.treeLeagues.setObjectName("treeLeagues")
-        self.treeLeagues.headerItem().setText(0, "1")
-        self.verticalLayout_3.addWidget(self.treeLeagues)
+        self.tree_csv_files.setPalette(palette)
+        self.tree_csv_files.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.tree_csv_files.setAlternatingRowColors(False)
+        self.tree_csv_files.setObjectName("tree_csv_files")
+        self.tree_csv_files.headerItem().setText(0, "Csv files")
+        self.verticalLayout_3.addWidget(self.tree_csv_files)
         self.horizontalLayout_4.addLayout(self.verticalLayout_3)
         self.verticalLayout_11 = QtGui.QVBoxLayout()
         self.verticalLayout_11.setObjectName("verticalLayout_11")
@@ -414,8 +417,14 @@ class Ui_MainWindow(object):
         self.verticalLayout_14 = QtGui.QVBoxLayout(self.tab_2)
         self.verticalLayout_14.setObjectName("verticalLayout_14")
         self.tree_picks = QtGui.QTreeWidget(self.tab_2)
+        self.tree_picks.setAllColumnsShowFocus(False)
+        self.tree_picks.setHeaderHidden(False)
         self.tree_picks.setObjectName("tree_picks")
-        self.tree_picks.headerItem().setText(0, "1")
+        self.tree_picks.headerItem().setText(0, "League")
+        self.tree_picks.header().setCascadingSectionResizes(True)
+        self.tree_picks.header().setDefaultSectionSize(50)
+        self.tree_picks.header().setSortIndicatorShown(False)
+        self.tree_picks.header().setStretchLastSection(True)
         self.verticalLayout_14.addWidget(self.tree_picks)
         self.button_picks_remove = QtGui.QPushButton(self.tab_2)
         self.button_picks_remove.setObjectName("button_picks_remove")
@@ -468,7 +477,7 @@ class Ui_MainWindow(object):
         self.actionAbout.setObjectName("actionAbout")
 
         self.retranslateUi(MainWindow)
-        self.tabWidget_2.setCurrentIndex(0)
+        self.tabWidget_2.setCurrentIndex(5)
         self.combo_home_mode.setCurrentIndex(1)
         self.combo_away_mode.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -509,6 +518,15 @@ class Ui_MainWindow(object):
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_main_home), QtGui.QApplication.translate("MainWindow", "Matches", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("MainWindow", "Minimum value", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab), QtGui.QApplication.translate("MainWindow", "Series", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(1, QtGui.QApplication.translate("MainWindow", "Home", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(2, QtGui.QApplication.translate("MainWindow", "Away", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(3, QtGui.QApplication.translate("MainWindow", "Bet", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(4, QtGui.QApplication.translate("MainWindow", "Net", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(5, QtGui.QApplication.translate("MainWindow", "Value", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(6, QtGui.QApplication.translate("MainWindow", "1", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(7, QtGui.QApplication.translate("MainWindow", "2", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(8, QtGui.QApplication.translate("MainWindow", "x2", None, QtGui.QApplication.UnicodeUTF8))
+        self.tree_picks.headerItem().setText(9, QtGui.QApplication.translate("MainWindow", "Comment", None, QtGui.QApplication.UnicodeUTF8))
         self.button_picks_remove.setText(QtGui.QApplication.translate("MainWindow", "Remove", None, QtGui.QApplication.UnicodeUTF8))
         self.button_picks_save.setText(QtGui.QApplication.translate("MainWindow", "Save to file", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_2), QtGui.QApplication.translate("MainWindow", "Picks", None, QtGui.QApplication.UnicodeUTF8))
